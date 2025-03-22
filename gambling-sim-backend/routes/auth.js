@@ -3,6 +3,7 @@ import registerSchema from '../validators/registerSchema.js';
 import vine from '@vinejs/vine';
 import sql from '../config/db.js';
 import bcrypt from 'bcryptjs';
+import dotenv from "dotenv";
 
 const router = express.Router();
 
@@ -57,40 +58,58 @@ router.post('/register', async (req, res) => {
 
 
 router.post('/login', async (req, res) => {
+
+  // Gets the login data
   const data = req.body;
 
+  // Stores the login info and password received
   const {login, password} = req.body;
 
+  // Checks if the user exists in DB
   const userExists = await sql`
     select
       *
     from users
     where username = ${login} or email = ${login}
   `
-
+  // If user doesn't exist, error out
   if (userExists.length <= 0) {
     console.log("User does not exist, please register an account")
     return res.status(404).json({error: "User does not exist", message: "This user does not exist, please register an account!"});
   }
 
+  // Store the user row (should only have one user, so the first index)
   const user = userExists[0];
 
+  // Start checking if the password matches the hashed password
   const isMatch = await bcrypt.compare(password, user.password);
 
-  
+  // If it matches, update the last_visit time
   if (isMatch) {
     await sql`
       update users
       set last_visit = NOW()
       where uid = ${user.uid}
     `
+    // Return a successful status code
+
+    // Token given to user, so when they login we don't have to keep authenticating everytime
+    // User is authenticated until the token expires
+    const token = jwt.sign( {uid: user.uid, username: user.username, email: user.email}, process.env.JWT_SECRET, {expiresIn: "1h"});
+
+    // Testing purposes
+    console.log(token)
 
     return res.status(200).json({
+      success: true,
       message: "Login successful",
-      user: {
-        uid: user.uid,
-        username: user.username,
-        email: user.email
+      data: {
+        token,
+        user: {
+          uid: user.uid,
+          username: user.username,
+          email: user.email
+        }
       }
     });
   } else {
