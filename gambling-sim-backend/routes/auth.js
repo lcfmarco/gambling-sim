@@ -74,19 +74,31 @@ router.post('/login', async (req, res) => {
   }
 
   const user = userExists[0];
-  bcrypt.compare(password, hash, (err, res) => {
-    if (res === true) {
-      sql`
-        update users
-        set last_visit = NOW()
-        where username = ${login} or email = ${login}
-      `
-      console.log("Login success");
-    } else {
-      console.log("Login fail");
-    }
-  });
 
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  
+  if (isMatch) {
+    await sql`
+      update users
+      set last_visit = NOW()
+      where uid = ${user.uid}
+    `
+
+    return res.status(200).json({
+      message: "Login successful",
+      user: {
+        uid: user.uid,
+        username: user.username,
+        email: user.email
+      }
+    });
+  } else {
+    return res.status(401).json({
+      error: "Invalid password",
+      message: "Incorrect password, please try again."
+    })
+  }
 });
 
 
