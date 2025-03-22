@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+
+dotenv.config();
+
 function verifyToken(req, res, next) {
   
   // Check if the token exists to begin with
@@ -29,3 +34,5 @@ function verifyToken(req, res, next) {
   }
 
 }
+
+export default verifyToken;

@@ -4,8 +4,12 @@ import vine from '@vinejs/vine';
 import sql from '../config/db.js';
 import bcrypt from 'bcryptjs';
 import dotenv from "dotenv";
+import verifyToken from '../middleware/verifyToken.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
+
+dotenv.config();
 
 router.post('/register', async (req, res) => {
   // Getting data
@@ -118,6 +122,15 @@ router.post('/login', async (req, res) => {
       message: "Incorrect password, please try again."
     })
   }
+});
+
+router.get('/dashboard', verifyToken, async(req, res) => {
+  const { username, uid } = req.user;
+
+  return res.status(200).json({
+    message: `Welcome back, ${username}`,
+    uid
+  });
 });
 
 
