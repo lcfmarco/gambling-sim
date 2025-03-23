@@ -23,7 +23,7 @@ router.get('/games', async (req, res) => {
       leagueID: 'NBA',
       startsAfter: new Date().toISOString(), // now
       bookmaker: 'draftkings',
-      limit: '1'
+      limit: '2'
     });
 
     // Combining the baseURL and the parameters to form the fullURL when I fetch the data using this endpoint
@@ -46,6 +46,8 @@ router.get('/games', async (req, res) => {
     const cleanedData = events.map(event => ({
       eventID: event.eventID,
       startTime: event.startTime,
+      seasonWeek: event.info.seasonWeek,
+      date: event.status.startsAt,
       homeTeam: event.teams.home.names.long,
       awayTeam: event.teams.away.names.long,
       homeTeamMoneyline: event.odds["points-home-game-ml-home"].byBookmaker.draftkings.odds,
