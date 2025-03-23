@@ -47,9 +47,13 @@ router.get('/games', async (req, res) => {
       eventID: event.eventID,
       startTime: event.startTime,
       homeTeam: event.teams.home.names.long,
-      awayTeam: event.teams.away.names.long
-      // moneyline: event.odds?.DraftKings?.moneyline,
-      // spread: event.odds?.DraftKings?.spread
+      awayTeam: event.teams.away.names.long,
+      homeTeamMoneyline: event.odds["points-home-game-ml-home"].byBookmaker.draftkings.odds,
+      awayTeamMoneyline: event.odds["points-away-game-ml-away"].byBookmaker.draftkings.odds,
+      homeTeamSpread: event.odds["points-home-game-sp-home"].byBookmaker.draftkings.spread,
+      homeTeamSpreadOdds: event.odds["points-home-game-sp-home"].byBookmaker.draftkings.odds,
+      awayTeamSpread: event.odds["points-away-game-sp-away"].byBookmaker.draftkings.spread,
+      awayTeamSpreadOdds: event.odds["points-away-game-sp-away"].byBookmaker.draftkings.odds
     }));
     
     // Returns the cleanedData
